@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daniel Robbert — Social Media & Content</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #080808;
+    --bg2: #0f0f0f;
+    --cream: #F2EBE0;
+    --orange: #FF4400;
+    --yellow: #FFE500;
+    --muted: #2a2a2a;
+    --dim: #555;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'DM Mono', monospace;
+    --font-ui: 'Syne', sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 14px;
+    cursor: none;
+    overflow-x: hidden;
+  }
+
+  /* CURSOR */
+  .cursor {
+    position: fixed; width: 10px; height: 10px;
+    background: var(--orange); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width .15s, height .15s, background .15s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed; width: 36px; height: 36px;
+    border: 1px solid rgba(255,68,0,.5); border-radius: 50%;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: width .2s, height .2s;
+  }
+  body:has(a:hover) .cursor, body:has(button:hover) .cursor { width: 20px; height: 20px; background: var(--yellow); }
+  body:has(a:hover) .cursor-ring, body:has(button:hover) .cursor-ring { width: 60px; height: 60px; }
+
+  /* NOISE */
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 1000; opacity: .3;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 24px 48px;
+    background: linear-gradient(to bottom, rgba(8,8,8,.95), transparent);
+  }
+  .nav-logo { font-family: var(--font-display); font-size: 22px; letter-spacing: 3px; color: var(--cream); text-decoration: none; }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a { font-family: var(--font-body); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); text-decoration: none; transition: color .2s; }
+  .nav-links a:hover { color: var(--orange); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    justify-content: flex-end; padding: 0 48px 80px;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg-number {
+    position: absolute; top: 50%; right: -40px; transform: translateY(-50%);
+    font-family: var(--font-display); font-size: clamp(300px, 40vw, 600px);
+    color: transparent; -webkit-text-stroke: 1px rgba(255,68,0,.07);
+    line-height: 1; pointer-events: none; user-select: none; white-space: nowrap;
+  }
+  .hero-eyebrow { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--orange); margin-bottom: 24px; opacity: 0; animation: fadeUp .8s .2s forwards; }
+  .hero-name { font-family: var(--font-display); font-size: clamp(80px, 14vw, 200px); line-height: .9; letter-spacing: -2px; color: var(--cream); opacity: 0; animation: fadeUp .8s .4s forwards; }
+  .hero-name span { color: var(--orange); }
+  .hero-subtitle { font-family: var(--font-ui); font-size: clamp(18px, 2.5vw, 30px); font-weight: 400; color: var(--dim); margin-top: 24px; max-width: 700px; line-height: 1.5; opacity: 0; animation: fadeUp .8s .6s forwards; }
+  .hero-subtitle strong { color: var(--cream); font-weight: 700; }
+  .hero-cta { margin-top: 48px; display: flex; gap: 20px; align-items: center; opacity: 0; animation: fadeUp .8s .8s forwards; }
+  .btn-primary { display: inline-flex; align-items: center; gap: 12px; background: var(--orange); color: #000; font-family: var(--font-body); font-size: 12px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; padding: 16px 32px; transition: background .2s, transform .2s; }
+  .btn-primary:hover { background: var(--yellow); transform: translateY(-2px); }
+  .btn-ghost { display: inline-flex; align-items: center; gap: 8px; color: var(--dim); font-family: var(--font-body); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; border-bottom: 1px solid var(--muted); padding-bottom: 4px; transition: color .2s, border-color .2s; }
+  .btn-ghost:hover { color: var(--cream); border-color: var(--cream); }
+
+  /* TICKER */
+  .ticker-wrap { background: var(--orange); overflow: hidden; white-space: nowrap; padding: 14px 0; }
+  .ticker { display: inline-flex; animation: ticker 30s linear infinite; }
+  .ticker-item { font-family: var(--font-display); font-size: 16px; letter-spacing: 3px; color: #000; padding: 0 40px; }
+  .ticker-dot { color: rgba(0,0,0,.4); }
+  @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* STATS */
+  .stats { padding: 120px 48px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--muted); }
+  .stat-block { background: var(--bg2); padding: 60px 40px; position: relative; overflow: hidden; opacity: 0; transform: translateY(30px); transition: opacity .6s ease, transform .6s ease; }
+  .stat-block.visible { opacity: 1; transform: translateY(0); }
+  .stat-block:nth-child(2) { transition-delay: .1s; }
+  .stat-block:nth-child(3) { transition-delay: .2s; }
+  .stat-block::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--orange); transform: scaleX(0); transform-origin: left; transition: transform .6s ease; }
+  .stat-block.visible::before { transform: scaleX(1); }
+  .stat-block:nth-child(2)::before { background: var(--yellow); }
+  .stat-number { font-family: var(--font-display); font-size: clamp(50px, 6vw, 90px); line-height: 1; color: var(--cream); display: block; }
+  .stat-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--dim); margin-top: 12px; line-height: 1.6; }
+
+  /* SHARED */
+  .section-label { font-size: 10px; letter-spacing: 5px; text-transform: uppercase; color: var(--orange); margin-bottom: 16px; }
+  .section-title { font-family: var(--font-display); font-size: clamp(60px, 8vw, 120px); line-height: .9; letter-spacing: -1px; }
+  .divider { height: 2px; background: linear-gradient(to right, var(--orange), var(--yellow), transparent); }
+  .scroll-reveal { opacity: 0; transform: translateY(40px); transition: opacity .8s ease, transform .8s ease; }
+  .scroll-reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* SKILLS */
+  .skills { padding: 120px 48px; background: var(--bg2); }
+  .skills-header { margin-bottom: 80px; border-bottom: 1px solid var(--muted); padding-bottom: 40px; }
+  .skills-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; background: var(--muted); }
+  .skill-block { background: var(--bg); padding: 48px 36px; opacity: 0; transform: translateY(30px); transition: opacity .6s ease, transform .6s ease, background .3s; position: relative; overflow: hidden; }
+  .skill-block:nth-child(2) { transition-delay: .08s; }
+  .skill-block:nth-child(3) { transition-delay: .16s; }
+  .skill-block:nth-child(4) { transition-delay: .24s; }
+  .skill-block:nth-child(5) { transition-delay: .32s; }
+  .skill-block:hover { background: #0d0d0d; }
+  .skill-block.visible { opacity: 1; transform: translateY(0); }
+  .skill-block::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--orange); transform: scaleX(0); transform-origin: left; transition: transform .4s ease; }
+  .skill-block:hover::after { transform: scaleX(1); }
+  .skill-block:nth-child(even)::after { background: var(--yellow); }
+  .skill-block-title { font-family: var(--font-display); font-size: 22px; letter-spacing: 2px; color: var(--orange); margin-bottom: 28px; line-height: 1.2; }
+  .skill-block:nth-child(even) .skill-block-title { color: var(--yellow); }
+  .skill-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .skill-list li { font-size: 12px; color: #777; letter-spacing: .5px; line-height: 1.5; padding-left: 14px; position: relative; transition: color .2s; }
+  .skill-list li::before { content: '—'; position: absolute; left: 0; color: var(--muted); font-size: 10px; }
+  .skill-block:hover .skill-list li { color: #bbb; }
+
+  /* WORK */
+  .work { padding: 120px 48px; background: var(--bg); }
+  .work-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 80px; border-bottom: 1px solid var(--muted); padding-bottom: 40px; }
+  .work-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; background: var(--muted); }
+  .work-card { background: var(--bg2); padding: 60px 48px; position: relative; overflow: hidden; opacity: 0; transform: translateY(40px); transition: opacity .7s ease, transform .7s ease, background .3s; }
+  .work-card:hover { background: #141414; }
+  .work-card.visible { opacity: 1; transform: translateY(0); }
+  .work-card:nth-child(2) { transition-delay: .15s; }
+  .work-card:nth-child(3) { transition-delay: .3s; }
+  .work-card-number { font-family: var(--font-display); font-size: 200px; position: absolute; bottom: -30px; right: 20px; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.04); line-height: 1; user-select: none; transition: -webkit-text-stroke .3s; }
+  .work-card:hover .work-card-number { -webkit-text-stroke: 1px rgba(255,68,0,.1); }
+  .work-card-tag { display: inline-block; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--orange); border: 1px solid var(--orange); padding: 4px 12px; margin-bottom: 32px; }
+  .work-card:nth-child(even) .work-card-tag { color: var(--yellow); border-color: var(--yellow); }
+  .work-card-company { font-family: var(--font-display); font-size: clamp(36px, 4vw, 56px); line-height: 1; margin-bottom: 8px; letter-spacing: 1px; }
+  .work-card-role { font-family: var(--font-ui); font-size: 16px; font-weight: 700; color: var(--dim); margin-bottom: 28px; }
+  .work-card-desc { font-size: 13px; line-height: 1.8; color: #888; position: relative; z-index: 1; max-width: 380px; }
+  .work-card-metrics { margin-top: 36px; display: flex; gap: 32px; }
+  .metric { position: relative; z-index: 1; }
+  .metric-value { font-family: var(--font-display); font-size: 28px; color: var(--cream); display: block; line-height: 1; }
+  .metric-label { font-size: 10px; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; margin-top: 4px; }
+
+  /* BRANDS */
+  .brands { padding: 120px 48px; background: var(--bg2); }
+  .brands-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 80px; border-bottom: 1px solid var(--muted); padding-bottom: 40px; }
+  .brands-subtitle { font-size: 13px; color: var(--dim); max-width: 320px; line-height: 1.8; }
+  .brands-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; background: var(--muted); }
+  .brand-card { background: var(--bg); padding: 52px 48px; opacity: 0; transform: translateY(30px); transition: opacity .6s ease, transform .6s ease, background .3s; position: relative; overflow: hidden; }
+  .brand-card:hover { background: #0d0d0d; }
+  .brand-card.visible { opacity: 1; transform: translateY(0); }
+  .brand-card:nth-child(2) { transition-delay: .07s; }
+  .brand-card:nth-child(3) { transition-delay: .14s; }
+  .brand-card:nth-child(4) { transition-delay: .21s; }
+  .brand-card:nth-child(5) { transition-delay: .28s; }
+  .brand-card:nth-child(6) { transition-delay: .35s; }
+  .brand-card:nth-child(7) { transition-delay: .42s; }
+  .brand-card:nth-child(8) { transition-delay: .49s; }
+  .brand-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--orange); transform: scaleX(0); transform-origin: left; transition: transform .4s ease; }
+  .brand-card:hover::before { transform: scaleX(1); }
+  .brand-card:nth-child(odd)::before { background: var(--yellow); }
+  .brand-name { font-family: var(--font-display); font-size: clamp(28px, 3vw, 44px); letter-spacing: 2px; color: var(--cream); line-height: 1; margin-bottom: 6px; }
+  .brand-parent { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--orange); margin-bottom: 24px; }
+  .brand-card:nth-child(odd) .brand-parent { color: var(--yellow); }
+  .brand-role { font-family: var(--font-ui); font-size: 13px; font-weight: 700; color: var(--dim); margin-bottom: 16px; }
+  .brand-desc { font-size: 12px; line-height: 1.9; color: #666; }
+
+  /* CONTACT */
+  .contact { padding: 140px 48px; position: relative; overflow: hidden; }
+  .contact-bg { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 800px; height: 800px; background: radial-gradient(circle, rgba(255,68,0,.06) 0%, transparent 70%); pointer-events: none; }
+  .contact-inner { max-width: 900px; position: relative; z-index: 1; }
+  .contact-heading { font-family: var(--font-display); font-size: clamp(70px, 10vw, 150px); line-height: .9; letter-spacing: -2px; margin-bottom: 48px; }
+  .contact-heading .line2 { color: var(--orange); display: block; }
+  .contact-links { display: flex; gap: 48px; flex-wrap: wrap; margin-bottom: 80px; }
+  .contact-link { display: flex; flex-direction: column; gap: 8px; text-decoration: none; transition: transform .2s; }
+  .contact-link:hover { transform: translateY(-4px); }
+  .contact-link-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--dim); }
+  .contact-link-value { font-family: var(--font-ui); font-size: 18px; font-weight: 700; color: var(--cream); }
+  .contact-link:hover .contact-link-value { color: var(--orange); }
+  .footer-bar { border-top: 1px solid var(--muted); padding-top: 32px; }
+  .footer-copy { font-size: 11px; color: var(--dim); letter-spacing: 2px; }
+
+  /* SCROLL INDICATOR */
+  .scroll-line { position: absolute; bottom: 48px; right: 48px; display: flex; align-items: center; gap: 16px; opacity: 0; animation: fadeUp .8s 1.2s forwards; }
+  .scroll-line span { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--dim); writing-mode: vertical-lr; }
+  .scroll-line-bar { width: 1px; height: 60px; background: var(--muted); position: relative; overflow: hidden; }
+  .scroll-line-bar::after { content: ''; position: absolute; top: -100%; left: 0; right: 0; height: 100%; background: var(--orange); animation: scrollBar 2s ease-in-out infinite; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes scrollBar { 0% { top: -100%; } 100% { top: 100%; } }
+
+  /* MOBILE */
+  @media (max-width: 960px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .hero { padding: 0 24px 60px; }
+    .stats { grid-template-columns: 1fr; padding: 60px 24px; }
+    .skills { padding: 80px 24px; }
+    .skills-grid { grid-template-columns: repeat(2, 1fr); }
+    .work { padding: 80px 24px; }
+    .work-grid { grid-template-columns: 1fr; }
+    .work-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+    .brands { padding: 80px 24px; }
+    .brands-grid { grid-template-columns: 1fr; }
+    .brands-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+    .contact { padding: 100px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <a href="#" class="nav-logo">DR</a>
+  <ul class="nav-links">
+    <li><a href="#work">Work</a></li>
+    <li><a href="#brands">Brands</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-number">1B</div>
+  <div class="hero-eyebrow">Social Media // Content // Bay Area</div>
+  <h1 class="hero-name">DANIEL<br><span>ROBBERT</span></h1>
+  <p class="hero-subtitle">
+    I build <strong>machines that grow audiences</strong>.<br>
+    Head of Social. 10 years. 1 billion views.
+  </p>
+  <div class="hero-cta">
+    <a href="#contact" class="btn-primary">
+      Let's work together
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L8 3M13 8L8 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a href="#work" class="btn-ghost">See the work</a>
+  </div>
+  <div class="scroll-line">
+    <div class="scroll-line-bar"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    <span class="ticker-item">HEAD OF SOCIAL</span><span class="ticker-item ticker-dot">◆</span>
+    <span class="ticker-item">AI CONTENT CREATOR</span><span class="ticker-item ticker-dot">◆</span>
+    <span class="ticker-item">GROWTH MARKETING</span><span class="ticker-item ticker-dot">◆</span>
+    <span class="ticker-item">DEVELOPER ADVOCATE</span><span class="ticker-item ticker-dot">◆</span>
+    <span class="ticker-item">FOUNDING MARKETER</span><span class="ticker-item ticker-dot">◆</span>
+    <span class="ticker-item">VIRAL CONTENT</span><span class="ticker-item ticker-dot">◆</span>
+    <span class="ticker-item">HEAD OF SOCIAL</span><span class="ticker-item ticker-dot">◆</span>
+    <span class="ticker-item">AI CONTENT CREATOR</span><span class="ticker-item ticker-dot">◆</span>
+    <span class="ticker-item">GROWTH MARKETING</span><span class="ticker-item ticker-dot">◆</span>
+    <span class="ticker-item">DEVELOPER ADVOCATE</span><span class="ticker-item ticker-dot">◆</span>
+    <span class="ticker-item">FOUNDING MARKETER</span><span class="ticker-item ticker-dot">◆</span>
+    <span class="ticker-item">VIRAL CONTENT</span><span class="ticker-item ticker-dot">◆</span>
+  </div>
+</div>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stat-block" data-scroll>
+    <span class="stat-number">1B+</span>
+    <div class="stat-label">YouTube Views<br>Generated</div>
+  </div>
+  <div class="stat-block" data-scroll>
+    <span class="stat-number">5M</span>
+    <div class="stat-label">Subscribers Built<br>at Braille Skating</div>
+  </div>
+  <div class="stat-block" data-scroll>
+    <span class="stat-number">150K</span>
+    <div class="stat-label">Subscribers in<br>&lt; 12 Months</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SKILLS -->
+<section class="skills" id="skills">
+  <div class="skills-header scroll-reveal" data-scroll>
+    <div class="section-label">Expertise</div>
+    <h2 class="section-title">THE<br>SKILL SET</h2>
+  </div>
+  <div class="skills-grid">
+    <div class="skill-block" data-scroll>
+      <div class="skill-block-title">YOUTUBE<br>STRATEGY</div>
+      <ul class="skill-list">
+        <li>Algorithm Hacking</li>
+        <li>SEO</li>
+        <li>A/B Testing</li>
+        <li>Retention Optimization</li>
+      </ul>
+    </div>
+    <div class="skill-block" data-scroll>
+      <div class="skill-block-title">CONTENT<br>CREATION</div>
+      <ul class="skill-list">
+        <li>Video Editing</li>
+        <li>Scriptwriting</li>
+        <li>On-Camera</li>
+        <li>Production Management</li>
+      </ul>
+    </div>
+    <div class="skill-block" data-scroll>
+      <div class="skill-block-title">BRAND<br>PARTNERSHIPS</div>
+      <ul class="skill-list">
+        <li>Fortune 500 Campaign Lead</li>
+        <li>Concept Development</li>
+        <li>Deliverables</li>
+      </ul>
+    </div>
+    <div class="skill-block" data-scroll>
+      <div class="skill-block-title">PLATFORM<br>GROWTH</div>
+      <ul class="skill-list">
+        <li>YouTube</li>
+        <li>TikTok</li>
+        <li>Instagram</li>
+        <li>Cross-Platform Storytelling</li>
+      </ul>
+    </div>
+    <div class="skill-block" data-scroll>
+      <div class="skill-block-title">CREATIVE<br>TOOLS</div>
+      <ul class="skill-list">
+        <li>Premiere Pro</li>
+        <li>CapCut</li>
+        <li>Canva</li>
+        <li>Photoshop</li>
+        <li>FL Studio</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- WORK -->
+<section class="work" id="work">
+  <div class="work-header">
+    <div>
+      <div class="section-label">Selected Work</div>
+      <h2 class="section-title">THE<br>WORK</h2>
+    </div>
+    <p style="font-size:13px;color:var(--dim);max-width:300px;line-height:1.8;">
+      From 0 to viral — the brands, channels, and products built from scratch.
+    </p>
+  </div>
+  <div class="work-grid">
+
+    <div class="work-card" data-scroll>
+      <div class="work-card-number">01</div>
+      <div class="work-card-tag">10 Years · Social Media</div>
+      <h3 class="work-card-company">BRAILLE<br>SKATEBOARDING</h3>
+      <div class="work-card-role">Head of Social Media</div>
+      <p class="work-card-desc">Ran content strategy end-to-end for one of YouTube's biggest skating channels. Grew from 2.5M to 5M subscribers. Launched TikTok from zero to 1M followers. Generated over 1 billion total views.</p>
+      <div class="work-card-metrics">
+        <div class="metric"><span class="metric-value">1B+</span><div class="metric-label">Total Views</div></div>
+        <div class="metric"><span class="metric-value">+2.5M</span><div class="metric-label">Subscribers Added</div></div>
+        <div class="metric"><span class="metric-value">1M</span><div class="metric-label">TikTok Launch</div></div>
+      </div>
+    </div>
+
+    <div class="work-card" data-scroll>
+      <div class="work-card-number">02</div>
+      <div class="work-card-tag">Founded · YouTube</div>
+      <h3 class="work-card-company">@ITS<br>DABOYZZ</h3>
+      <div class="work-card-role">Founder & Creator</div>
+      <p class="work-card-desc">Built an independent skateboarding YouTube channel to 150K subscribers in under a year from nothing. Zero budget. Pure content strategy, editing, and audience growth instinct.</p>
+      <div class="work-card-metrics">
+        <div class="metric"><span class="metric-value">150K</span><div class="metric-label">Subscribers</div></div>
+        <div class="metric"><span class="metric-value">&lt;12mo</span><div class="metric-label">Time to Scale</div></div>
+      </div>
+    </div>
+
+    <div class="work-card" data-scroll>
+      <div class="work-card-number">03</div>
+      <div class="work-card-tag">Shipped · Mobile App</div>
+      <h3 class="work-card-company">MOB<br>MAPS</h3>
+      <div class="work-card-role">Founder & Builder</div>
+      <p class="work-card-desc">Built and shipped a GPS-powered skate spot finder app. Took it from concept to product — market research, UI/UX, development, and go-to-market strategy. Built because no one else would.</p>
+      <div class="work-card-metrics">
+        <div class="metric"><span class="metric-value">GPS</span><div class="metric-label">Spot Finder</div></div>
+        <div class="metric"><span class="metric-value">0→1</span><div class="metric-label">Solo Built</div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- BRANDS -->
+<section class="brands" id="brands">
+  <div class="brands-header">
+    <div>
+      <div class="section-label">Major Brand Campaign Experience</div>
+      <h2 class="section-title">THE<br>BRANDS</h2>
+    </div>
+    <p class="brands-subtitle">Proven track record with Fortune 500 companies and global brands.</p>
+  </div>
+  <div class="brands-grid">
+
+    <div class="brand-card" data-scroll>
+      <div class="brand-name">CINNAMON<br>TOAST CRUNCH</div>
+      <div class="brand-parent">General Mills</div>
+      <div class="brand-role">Lead Producer</div>
+      <p class="brand-desc">Translated creative briefs from General Mills into successful, multi-platform video campaigns. Directly responsible for concept development, production management, and final delivery of all video assets.</p>
+    </div>
+
+    <div class="brand-card" data-scroll>
+      <div class="brand-name">BRISK /<br>RUFFLES</div>
+      <div class="brand-parent">PepsiCo</div>
+      <div class="brand-role">Lead Producer</div>
+      <p class="brand-desc">Translated creative briefs from PepsiCo into successful, multi-platform video campaigns. Directly responsible for concept development, production management, and final delivery of all video assets.</p>
+    </div>
+
+    <div class="brand-card" data-scroll>
+      <div class="brand-name">THE LEGO<br>GROUP</div>
+      <div class="brand-parent">Global Brand Campaign</div>
+      <div class="brand-role">Primary Creative Lead</div>
+      <p class="brand-desc">Delivered video content meeting the rigorous brand standards of The Lego Group. Personally ensured final products aligned with their global marketing objectives.</p>
+    </div>
+
+    <div class="brand-card" data-scroll>
+      <div class="brand-name">TONY HAWK'S<br>PRO SKATER</div>
+      <div class="brand-parent">Activision</div>
+      <div class="brand-role">Project Lead</div>
+      <p class="brand-desc">Planned and executed core video deliverables for the marketing campaign with deep coordination to ensure content authentically represented the game while engaging the audience.</p>
+    </div>
+
+    <div class="brand-card" data-scroll>
+      <div class="brand-name">NERF</div>
+      <div class="brand-parent">Brand Integration</div>
+      <div class="brand-role">Campaign Manager</div>
+      <p class="brand-desc">Managed successful brand integration ensuring key messaging was delivered effectively without compromising entertainment value, resulting in high-performing sponsored videos.</p>
+    </div>
+
+    <div class="brand-card" data-scroll>
+      <div class="brand-name">SQUARESPACE</div>
+      <div class="brand-parent">Brand Integration</div>
+      <div class="brand-role">Campaign Manager</div>
+      <p class="brand-desc">Managed successful brand integration ensuring key messaging was delivered effectively without compromising entertainment value, resulting in high-performing sponsored videos.</p>
+    </div>
+
+    <div class="brand-card" data-scroll>
+      <div class="brand-name">TEMU</div>
+      <div class="brand-parent">Product Integration Campaign</div>
+      <div class="brand-role">Campaign Lead</div>
+      <p class="brand-desc">Spearheaded a dedicated product integration campaign, seamlessly weaving promotional messaging into high-energy video content to drive conversions and amplify brand visibility.</p>
+    </div>
+
+    <div class="brand-card" data-scroll>
+      <div class="brand-name">UNDERDOG<br>SPORTS</div>
+      <div class="brand-parent">Episodic Series Partnership</div>
+      <div class="brand-role">Negotiator & Producer</div>
+      <p class="brand-desc">Negotiated and produced a targeted brand partnership spanning a multi-video episodic series. Delivered high-retention, 30-second integrated sponsor features that maximized audience engagement and ROI.</p>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-bg"></div>
+  <div class="contact-inner">
+    <div class="scroll-reveal" data-scroll>
+      <div class="section-label">Get in Touch</div>
+      <h2 class="contact-heading">LET'S<br><span class="line2">BUILD.</span></h2>
+    </div>
+    <div class="contact-links scroll-reveal" data-scroll>
+      <a href="mailto:dnlrbbrt@gmail.com" class="contact-link">
+        <span class="contact-link-label">Email</span>
+        <span class="contact-link-value">dnlrbbrt@gmail.com</span>
+      </a>
+      <a href="tel:9255507623" class="contact-link">
+        <span class="contact-link-label">Phone</span>
+        <span class="contact-link-value">(925) 550-7623</span>
+      </a>
+    </div>
+    <div class="footer-bar scroll-reveal" data-scroll>
+      <span class="footer-copy">© 2025 Daniel Robbert — Bay Area, CA</span>
+    </div>
+  </div>
+</section>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+  });
+  (function animateRing() {
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  })();
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('[data-scroll], .scroll-reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
